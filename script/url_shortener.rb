@@ -134,12 +134,12 @@ def print_stats
   puts "Enter URL to print stats for:"
   input_url = gets.chomp
   short_url = ShortUrl.find_by_url(input_url)
-  visitors = visits.where(:short_url_id => short_url.id)
+  visitors = Visit.where(:short_url_id => short_url.id)
   current_time = Time.now - 600
-  past_ten_min = visits.where("created_at >= ?", Time.now - 10.minutes)
+  past_ten_min = Visit.where("created_at >= ?", Time.now - 10.minutes)
 
   puts "Number of Visitors : #{visitors.count}"
-  puts "Number of Unique Visitors : #{visitors.uniq.count}"
+  puts "Number of Unique Visitors : #{visitors.count(:user_id, :distinct => true)}"
   puts "Visitors in past ten minutes:"
   puts past_ten_min
 end
