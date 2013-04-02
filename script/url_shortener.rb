@@ -80,9 +80,9 @@ def show_tags
   puts "Which short URL are you interested in?"
   input_url = gets.chomp
   short_url = ShortUrl.find_by_url(input_url)
-  tagging_objs = Tagging.joins("JOIN short_urls ON taggings.short_url_id = #{short_url.id}")
+  tagging_objs = Tagging.select('tag_id')
+                        .joins(:short_url)#{}"JOIN short_urls ON taggings.short_url_id = #{short_url.id}")
                         .where('short_urls.url = ?',  input_url)
-                        .select('tag_id')
   tagging_objs.each do |tagging|
     puts Tag.find(tagging.tag_id).name
   end

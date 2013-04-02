@@ -4,7 +4,7 @@ class Tag < ActiveRecord::Base
 
   attr_accessible :name
 
-  ALLOWED_TAGS = ["Cats", "Dogs", "Kittens", "Puppies"]
+  #ALLOWED_TAGS = ["Cats", "Dogs", "Kittens", "Puppies"]
 
   def self.add(name)
     unless ALLOWED_TAGS.include?(name)

@@ -3,6 +3,8 @@ class ShortUrl < ActiveRecord::Base
   belongs_to :long_url
   has_many :visits
   has_many :tags, :through => :taggings
+  has_many :taggings
+  
   attr_accessible :url, :user_id, :long_id
 
   def self.add(long_url, user)
