@@ -14,6 +14,12 @@ def run
     when 5
       print_user_links
     when 6
+      add_tags
+    when 7
+      show_tags
+    when 8
+      most_popular_url
+    when 9
       break
     end
   end
@@ -39,7 +45,10 @@ def get_input
   puts "3. Add comment"
   puts "4. Print URL stats"
   puts "5. Print user's links"
-  puts "6. Quit"
+  puts "6. Add tag to URL"
+  puts "7. Show tags on URL"
+  puts "8. Show most popular URL"
+  puts "9. Quit"
   valid_input = false
   until valid_input
     input = gets.chomp.scan(/\d/)
@@ -48,16 +57,42 @@ def get_input
   input.first.to_i
 end
 
+def most_popular_url
+  puts ShortUrl.most_popular_url.url
+end
+
+def add_tags
+  puts "Input link to tag:"
+  input_url = gets.chomp
+  puts "Enter tag for your link:"
+  input_tag = gets.chomp
+  find_tag = Tag.find_by_name(input_tag)
+  if find_tag.nil?
+    tag_id = Tag.create(:name => input_tag).id
+  else
+    tag_id = find_tag.id
+  end
+  find_short_url = ShortUrl.find_by_url(input_url)
+  Tagging.create(:tag_id => tag_id, :short_url_id => find_short_url.id)
+end
+
+def show_tags
+  puts "Which short URL are you interested in?"
+  input_url = gets.chomp
+  short_url = ShortUrl.find_by_url(input_url)
+  tagging_objs = Tagging.joins("JOIN short_urls ON taggings.short_url_id = #{short_url.id}")
+                        .where('short_urls.url = ?',  input_url)
+                        .select('tag_id')
+  tagging_objs.each do |tagging|
+    puts Tag.find(tagging.tag_id).name
+  end
+end
+
 def add_url(user)
   puts "Enter the URL you would like shortened:"
   long_url = gets.chomp
-  puts "Allowed tags:"
-  puts ["Dogs", "Cats", "Puppies", "Kittens"]
-  puts "Enter tag for your link:"
-  input_tag = gets.chomp
   short_url = ShortUrl.add(long_url, user)
   puts short_url.url
-  #Tag.create()
 end
 
 def launch(user)
@@ -99,9 +134,9 @@ def print_stats
   puts "Enter URL to print stats for:"
   input_url = gets.chomp
   short_url = ShortUrl.find_by_url(input_url)
-  visitors = Visit.where(:short_url_id => short_url.id)
+  visitors = visits.where(:short_url_id => short_url.id)
   current_time = Time.now - 600
-  past_ten_min = Visit.where("created_at >= ?", current_time)
+  past_ten_min = visits.where("created_at >= ?", Time.now - 10.minutes)
 
   puts "Number of Visitors : #{visitors.count}"
   puts "Number of Unique Visitors : #{visitors.uniq.count}"

@@ -6,10 +6,10 @@ class Tag < ActiveRecord::Base
 
   ALLOWED_TAGS = ["Cats", "Dogs", "Kittens", "Puppies"]
 
-  def self.add(initial_cols)
-    unless ALLOWED_TAGS.include?(initial_cols[:name])
+  def self.add(name)
+    unless ALLOWED_TAGS.include?(name)
       raise 'Forbidden tag'
     end
-    Tag.create(initial_cols)
+    Tag.create(:name => name)
   end
 end
